@@ -5,19 +5,24 @@ export class Generator extends Component {
         super();
         this.state = {
             gender: 'male',
-            firstName: '',
-            lastName: '',
+            name: '',
             birth: '',
             username: '',
             password: '',
             email: '',
             nat: 'US',
-            city: '',
+            cellphone: '',
             address: '',
-            picture: ''
+            nationalId: '',
+            picture: '',
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    randomEmail() {
+        let domains = ["gmail.com", "hotmail.com", "tutanota.com", "protonmail.com", "yahoo.com"];
+        return "@" + domains[Math.floor(Math.random() * domains.length)];
     }
 
     handleChange(event) {
@@ -29,20 +34,20 @@ export class Generator extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        let apiCall = "https://randomuser.me/api/1.3/?nat=" + this.state.nat + "&gender=" + this.state.gender;
+        let apiCall = "https://randomuser.me/api/1.3/?nat=" + this.state.nat + "&gender=" + this.state.gender + "&password=upper,lower,number,8-16&noinfo";
         fetch(apiCall)
             .then(response => response.json())
             .then(json => json.results[0])
             .then(data => {
                 this.setState({
-                    firstName: data.name.first,
-                    lastName: data.name.last,
+                    name: data.name.first + " " + data.name.last,
                     birth: data.dob.date.split('T')[0],
                     username: data.login.username,
                     password: data.login.password,
-                    email: data.email,
-                    city: data.location.city,
-                    address: data.location.street.name + " " + data.location.street.number + ", " + data.location.postcode,
+                    email: data.email.split('@')[0] + this.randomEmail(),
+                    cellphone: data.cell,
+                    address: data.location.street.name + " " + data.location.street.number + ", " + data.location.postcode + " " + data.location.city,
+                    nationalId: data.id.value,
                     picture: data.picture.large
                 })
             });
@@ -58,33 +63,26 @@ export class Generator extends Component {
 
                         <b>Gender</b><br />
                         <input name="gender" type="radio" value="male" id="male" onChange={this.handleChange} />
-                        <label for="male">Male</label> <br />
+                        <label htmlFor="male">Male</label> <br />
                         <input name="gender" type="radio" value="female" id="female" onChange={this.handleChange} />
-                        <label for="female">Female</label> <br /><br />
-
-
+                        <label htmlFor="female">Female</label> <br /><br />
 
                         <b>Nationality</b><br />
                         <input name="nat" type="radio" value="US" id="US" onChange={this.handleChange} />
-                        <label for="US">American</label> <br />
+                        <label htmlFor="US">American</label> <br />
 
                         <input name="nat" type="radio" value="NO" id="NO" onChange={this.handleChange} />
-                        <label for="NO">Norwegian</label> <br /><br />
+                        <label htmlFor="NO">Norwegian</label> <br /><br />
 
-
-                        <button>Generate identity!</button>
+                        <button>Generate identity</button>
                     </form>
 
 
                     <table>
                         <tbody>
                             <tr>
-                                <td className="muted">First name</td>
-                                <td>{this.state.firstName}</td>
-                            </tr>
-                            <tr>
-                                <td className="muted">Last name</td>
-                                <td>{this.state.lastName}</td>
+                                <td className="muted">Name</td>
+                                <td>{this.state.name}</td>
                             </tr>
                             <tr>
                                 <td className="muted">Date of birth</td>
@@ -103,18 +101,22 @@ export class Generator extends Component {
                                 <td>{this.state.email}</td>
                             </tr>
                             <tr>
-                                <td className="muted">City</td>
-                                <td>{this.state.city}</td>
+                                <td className="muted">Phone number</td>
+                                <td>{this.state.cellphone}</td>
                             </tr>
                             <tr>
                                 <td className="muted">Address</td>
                                 <td>{this.state.address}</td>
                             </tr>
+                            <tr>
+                                <td className="muted">National ID</td>
+                                <td>{this.state.nationalId}</td>
+                            </tr>
                         </tbody>
                     </table>
 
                     <h3>Picture</h3>
-                    <img src={this.state.picture} alt="User avatar here!" />
+                    <img src={this.state.picture} alt="User avatar here." />
                 </main>
             </div>
         )
